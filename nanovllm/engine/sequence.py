@@ -3,7 +3,9 @@ from enum import Enum, auto
 from itertools import count
 
 from nanovllm.sampling_params import SamplingParams
-
+# from nanovllm.structured_output.request import StructuredOutputRequest
+import numpy as np
+import numpy.typing as npt
 
 class SequenceStatus(Enum):
     WAITING = auto()
@@ -19,6 +21,7 @@ class Sequence:
         self.seq_id = next(Sequence.counter)
         self.status = SequenceStatus.WAITING
         self.token_ids = copy(token_ids)
+        self.output_token_ids = []
         self.last_token = token_ids[-1]
         self.num_tokens = len(self.token_ids)
         self.num_prompt_tokens = len(token_ids)
@@ -27,6 +30,17 @@ class Sequence:
         self.temperature = sampling_params.temperature
         self.max_tokens = sampling_params.max_tokens
         self.ignore_eos = sampling_params.ignore_eos
+        self.sampling_params = sampling_params
+        from nanovllm.structured_output.request import StructuredOutputRequest
+
+        self.structured_output_request = StructuredOutputRequest.from_sampling_params(
+            sampling_params
+        )
+        # self.grammar_bitmask: "npt.NDArray[np.int32] | None"
+
+    @property
+    def use_structured_output(self) -> bool:
+        return self.structured_output_request is not None
 
     def __len__(self):
         return self.num_tokens
@@ -48,7 +62,7 @@ class Sequence:
 
     @property
     def completion_token_ids(self):
-        return self.token_ids[self.num_prompt_tokens:]
+        return self.token_ids[self.num_prompt_tokens:-1]
 
     @property
     def num_cached_blocks(self):
@@ -68,6 +82,7 @@ class Sequence:
 
     def append_token(self, token_id: int):
         self.token_ids.append(token_id)
+        self.output_token_ids.append(token_id)
         self.last_token = token_id
         self.num_tokens += 1
 

@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import List
 from transformers import AutoConfig
 
 
@@ -7,13 +8,13 @@ from transformers import AutoConfig
 class Config:
     model: str
     max_num_batched_tokens: int = 16384
-    max_num_seqs: int = 512
+    max_num_seqs: int = 256
     max_model_len: int = 4096
     gpu_memory_utilization: float = 0.9
     tensor_parallel_size: int = 1
     enforce_eager: bool = False
     hf_config: AutoConfig | None = None
-    eos: int = -1
+    eos = 151645
     kvcache_block_size: int = 256
     num_kvcache_blocks: int = -1
 
