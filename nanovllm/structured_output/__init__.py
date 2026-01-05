@@ -58,7 +58,7 @@ class StructuredOutputManager:
         if self.backend is None:
             assert request.sampling_params is not None
             backend = request.sampling_params.structured_outputs._backend
-            vocab_size = 151936
+            vocab_size = self.config.vocab_size
             if backend == "xgrammar":
                 self.backend = XgrammarBackend(
                     self.config,

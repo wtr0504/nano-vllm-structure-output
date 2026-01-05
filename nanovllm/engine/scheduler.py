@@ -105,7 +105,7 @@ class Scheduler:
                 self.running.remove(seq)
 
             if seq.structured_output_request:
-                seq.structured_output_request.grammar.accept_tokens(seq.seq_id, [token_id])
+                advanced = seq.structured_output_request.grammar.accept_tokens(seq.seq_id, [token_id])
                 if not advanced or seq.structured_output_request.grammar.is_terminated():
                     if seq.status == SequenceStatus.FINISHED:
                         continue
